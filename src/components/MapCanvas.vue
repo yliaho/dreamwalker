@@ -8,6 +8,8 @@ type ScrollMap = {
 
 const props = defineProps({
   imageDatas: Array,
+  canvasWidth: Number,
+  canvasHeight: Number,
 });
 
 const canvasRef = ref<HTMLCanvasElement>();
@@ -18,20 +20,33 @@ const scrollMapRef = ref<ScrollMap>({
 const scaleRef = ref<number>(1);
 
 watchEffect(() => {
-  if (!props.imageDatas || !canvasRef.value) {
+  if (
+    !props.imageDatas ||
+    !canvasRef.value ||
+    !props.canvasWidth ||
+    !props.canvasHeight
+  ) {
     console.error("no map or other stuff");
     return;
   }
 
-  draw(canvasRef.value.getContext("2d")!, props.imageDatas as any);
+  draw(
+    canvasRef.value.getContext("2d")!,
+    props.imageDatas as any,
+    props.canvasWidth,
+    props.canvasHeight
+  );
 });
 
 function draw(
   ctx: CanvasRenderingContext2D,
-  imageDatas: Array<{ dx: number; dy: number; data: ImageData }>
+  imageDatas: Array<{ dx: number; dy: number; data: Promise<ImageBitmap> }>,
+  canvasWidth: number,
+  canvasHeight: number
 ) {
-  imageDatas.forEach((imageData, index) => {
-    ctx.putImageData(imageData.data, imageData.dx, imageData.dy);
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
+  imageDatas.forEach(async (imageData, index) => {
+    ctx.drawImage(await imageData.data, imageData.dx, imageData.dy);
   });
 }
 </script>
@@ -39,8 +54,8 @@ function draw(
 <template>
   <canvas
     ref="canvasRef"
-    :width="1200"
-    :height="1200"
+    :width="canvasWidth"
+    :height="canvasHeight"
     tabindex="0"
     class="canvas"
   ></canvas>

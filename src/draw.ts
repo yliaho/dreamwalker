@@ -34,15 +34,16 @@ function drawTo(
   imageData: ImageData,
   buffer: Uint8Array,
   x: number,
-  y: number
+  y: number,
+  wall: boolean = false
 ) {
   // const rowSize = ~~((32 * imageData.width + 31) / 32) * 4;
   const off = x + imageData.width * y;
   for (let x = 0; x < imageData.data.length; x += 4) {
-    imageData.data[off * y * 4 + x + 0] = buffer[x + 1];
-    imageData.data[off * y * 4 + x + 1] = buffer[x + 2];
-    imageData.data[off * y * 4 + x + 2] = buffer[x + 3];
-    imageData.data[off * y * 4 + x + 3] = 255;
+    imageData.data[x + 0] = buffer[x + 1];
+    imageData.data[x + 1] = buffer[x + 2];
+    imageData.data[x + 2] = buffer[x + 3];
+    imageData.data[x + 3] = buffer[x + 0];
   }
   // for (let y = 0; y < buffer.length / (24 * 4); y++) {
   //   for (let x = 0; x < buffer.length / (16 * 4); x += 4) {
@@ -59,7 +60,7 @@ export function createTileMapImageData(
   scrollMap: { v: number; h: number },
   mapWidth: number,
   scale: number
-): Array<{ dx: number; dy: number; data: ImageData }> {
+): Array<{ dx: number; dy: number; data: Promise<ImageBitmap> }> {
   tileCache.clear();
   const map = gameMap.map;
 
@@ -68,7 +69,8 @@ export function createTileMapImageData(
     return [];
   }
 
-  const tiles: Array<{ dx: number; dy: number; data: ImageData }> = [];
+  const tiles: Array<{ dx: number; dy: number; data: Promise<ImageBitmap> }> =
+    [];
 
   for (let y = 0; y < map.height; y++) {
     for (let x = 0; x < map.width / scale; x++) {
@@ -80,26 +82,28 @@ export function createTileMapImageData(
       if (tile.tileId !== -1) {
         const tileImageData = new ImageData(24 * scale, 16 * scale);
         drawTo(tileImageData, getTile(tile.tileId, gameMap), 0, 0);
-        tiles.push({ dx, dy, data: tileImageData });
+        tiles.push({ dx, dy, data: createImageBitmap(tileImageData) });
       }
 
-      // if (tile.wallTiles) {
-      //   for (let index = 0; index < tile.wallTiles.count; index++) {
-      //     if (tile.wallTiles.tiles[index] !== -1) {
-      //       const wallTileImageData = new ImageData(
-      //         24 * scale + 1,
-      //         16 * scale + 1
-      //       );
-      //       drawTo(
-      //         wallTileImageData,
-      //         getTile(tile.wallTiles.tiles[index], gameMap),
-      //         0,
-      //         0 + (index - tile.wallTiles.offset + 1) * 16 * scale
-      //       );
-      //       tiles.push({ dx, dy, data: wallTileImageData });
-      //     }
-      //   }
-      // }
+      if (tile.wallTiles) {
+        for (let index = 0; index < tile.wallTiles.count; index++) {
+          if (tile.wallTiles.tiles[index] !== -1) {
+            const wallTileImageData = new ImageData(24 * scale, 16 * scale);
+            drawTo(
+              wallTileImageData,
+              getTile(tile.wallTiles.tiles[index], gameMap),
+              0,
+              0,
+              true
+            );
+            tiles.push({
+              dx,
+              dy: dy + (index - tile.wallTiles.offset + 1) * 16 * scale,
+              data: createImageBitmap(wallTileImageData),
+            });
+          }
+        }
+      }
     }
   }
 
@@ -118,4 +122,13 @@ function getTile(tileId: number, gameMap: GameMap) {
   }
 
   return tileCache.get(tileId)!;
+}
+
+function drawMap(levelWidth: number, levelHeight: number) {
+  const levelImageData = new ImageData(levelWidth, levelHeight);
+
+  // Let's pretend these are tiles
+  const tiles = new Array(32);
+  const tileWidth = 24;
+  const tileHeight = 16;
 }

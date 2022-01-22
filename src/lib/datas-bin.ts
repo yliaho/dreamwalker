@@ -93,8 +93,6 @@ function bitmapDataFromPsxBuff(
   const rowsize = ~~((32 * width + 31) / 32) * 4;
   const pixels = createUInt8ArrayFrom(rowsize * Math.abs(height));
 
-  debugger;
-
   if (bpp == 16) {
     // palette
     let dex = 0;
@@ -320,7 +318,7 @@ class AMap {
       return new MapTile(binaryReader);
     });
 
-    this.wallTileOffset = ~~(binaryReader.getPosition() - binOffset);
+    this.wallTileOffset = binaryReader.getPosition() - binOffset;
 
     for (let i = 0; i < this.mapTiles.length; i++) {
       this.mapTiles[i].loadWallTiles(
