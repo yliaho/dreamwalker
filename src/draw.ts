@@ -71,14 +71,14 @@ export function createTileMapImageData(
   const tiles: Array<{ dx: number; dy: number; data: ImageData }> = [];
 
   for (let y = 0; y < map.height; y++) {
-    for (let x = 0; x < map.width; x++) {
+    for (let x = 0; x < map.width / scale; x++) {
       const tile = map.mapTiles[y * map.width + x];
 
       const dx = x * scale * 24;
       const dy = (y - tile.height) * scale * 16;
 
       if (tile.tileId !== -1) {
-        const tileImageData = new ImageData(24, 16);
+        const tileImageData = new ImageData(24 * scale, 16 * scale);
         drawTo(tileImageData, getTile(tile.tileId, gameMap), 0, 0);
         tiles.push({ dx, dy, data: tileImageData });
       }
@@ -108,7 +108,7 @@ export function createTileMapImageData(
 
 const tileCache = new Map<number, Uint8Array>();
 function getTile(tileId: number, gameMap: GameMap) {
-  const tile = tileId & 0x3fff;
+  const tile = tileId & 0x3ff;
   const palIndex = (tileId & 0xf000) >> 12;
   if (!tileCache.get(tileId)) {
     tileCache.set(
