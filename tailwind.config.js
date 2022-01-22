@@ -1,0 +1,32 @@
+module.exports = {
+  content: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
+  theme: {
+    extend: {
+      colors: {
+        "primary-foreground": "#efe7d8",
+        "primary-foreground-faint": "#bfc0a1",
+        "primary-foreground-fainter": "#878778",
+        "primary-background": "#414131",
+        "secondary-foreground": "#273010",
+        "secondary-background": "#b8b090",
+        "alundra-red-1": "#eae9a7",
+        "alundra-red-2": "#e0c635",
+        "alundra-red-3": "#c68e33",
+        "alundra-red-4": "#b57233",
+        "alundra-red-5": "#90402c",
+        "alundra-red-6": "#673419",
+        "alundra-red-7": "#342004",
+        // "alundra-red": "#a86958",
+        // "alundra-brown": "#b68e0d",
+        // "alundra-yellow": "#d7d071",
+        // "alundra-beige": "#efe8d8",
+        "alundra-gray-1": "#f0f0d9",
+        "alundra-gray-2": "#c8c8a8",
+        "alundra-gray-3": "#888878",
+        "alundra-gray-4": "#30383f",
+        "alundra-gray-5": "#181810",
+      },
+    },
+  },
+  plugins: [],
+};

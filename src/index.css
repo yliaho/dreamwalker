@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  font-size: 13px;
+}
+
+@layer components {
+  .canvas {
+    background-image: /* tint image */ linear-gradient(
+        to right,
+        rgba(120, 120, 120, 0.75),
+        rgba(120, 120, 120, 0.75)
+      ),
+      /* checkered effect */ linear-gradient(to right, black 50%, white 50%),
+      linear-gradient(to bottom, black 50%, white 50%);
+    background-blend-mode: normal, difference, normal;
+    background-size: 48px 32px;
+  }
+
+  .palette {
+    background-position: 1px 0px;
+    background-image: /* tint image */ linear-gradient(
+        to right,
+        rgba(120, 120, 120, 0.75),
+        rgba(120, 120, 120, 0.75)
+      ),
+      /* checkered effect */ linear-gradient(to right, black 50%, white 50%),
+      linear-gradient(to bottom, black 50%, white 50%);
+    background-blend-mode: normal, difference, normal;
+    background-size: calc(100% / 17) calc(100% / 32);
+  }
+
+  button,
+  input[type="file"]::-webkit-file-upload-button,
+  input[type="file"]::file-selector-button {
+    @apply text-white px-3 py-1 rounded;
+    background-image: conic-gradient(
+        from 1.5708rad at 50% 50%,
+        rgba(29, 0, 255, 0.3) 0%,
+        rgba(0, 255, 212, 0.26) 46%,
+        rgba(157, 0, 96, 0.4) 54%,
+        rgba(255, 250, 0, 0.26) 97%
+      ),
+      linear-gradient(
+        179deg,
+        rgba(0, 0, 0, 0) 0%,
+        rgba(120, 255, 232, 0.37) 100%
+      );
+    border: 1px solid hsla(0, 0%, 100%, 0.5);
+
+    box-shadow: inset 0 -1px 0 0 rgba(138, 255, 225, 0.3);
+  }
+}
