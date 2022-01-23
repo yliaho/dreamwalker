@@ -1,11 +1,19 @@
-# Vue 3 + Typescript + Vite
+<h1 align="center">Dreamwalker</h1>
+<h3 align="center">Analyser and asset viewer for Alundra PS1 video game</h3>
 
-This template should help get you started developing with Vue 3 and Typescript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## What is Dreamwalker
 
-## Recommended IDE Setup
+Dreamwalker is an HTML5 app for parsing and analysing raw assets from a Playstation 1 video game Alundra, released in 1997. It uses modern browser APIs for reading the game's main binary file, HTML5 canvas for rendering and Vue 3 for the UI. The aim is to make an user friendly application for browsing, analysing and extracting the game's assets without any technical know-how.
 
-- [VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar)
+<p align="center">
+  <img src="./github/assets/alundra-logo.bmp">
+</p>
 
-## Type Support For `.vue` Imports in TS
+## Develop
 
-Since TypeScript cannot handle type information for `.vue` imports, they are shimmed to be a generic Vue component type by default. In most cases this is fine if you don't really care about component prop types outside of templates. However, if you wish to get actual prop types in `.vue` imports (for example to get props validation when using manual `h(...)` calls), you can enable Volar's `.vue` type support plugin by running `Volar: Switch TS Plugin on/off` from VSCode command palette.
+To run the application, clone this repo.
+
+- Run `npm install` to install the dependencies
+- Run `npm run dev` to start the vite development server.
+
+This repository does not contain the necessary asset file. You need to provide the binary yourself. Get yourself the Alundra disc image, and find a file called `DATAS.BIN`. Once you have the app running, you can upload the file to the application.
