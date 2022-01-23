@@ -213,7 +213,7 @@ canvas {
 
 input[type="file"]::-webkit-file-upload-button,
 input[type="file"]::file-selector-button {
-  @apply bg-black;
+  @apply bg-black text-white border-none bg-blue-600 px-2 py-2;
 }
 
 .visible-scrollbar,
