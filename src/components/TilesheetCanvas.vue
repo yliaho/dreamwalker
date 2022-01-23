@@ -3,9 +3,7 @@ import { inject, onMounted, onUpdated, ref, watchEffect } from "vue";
 import { DatasBin } from "../lib/datas-bin";
 import { DatasBinKey } from "../useDatasBin";
 
-const props = defineProps({
-  imageData: ImageData,
-});
+const props = defineProps<{ imageData: ImageData; scale: number }>();
 
 inject(DatasBinKey);
 const canvasWidth = 256;
@@ -27,13 +25,22 @@ function draw(ctx: CanvasRenderingContext2D, imageData: ImageData) {
 </script>
 
 <template>
-  <canvas
-    ref="canvasRef"
-    :width="canvasWidth"
-    :height="canvasHeight"
-    tabindex="0"
-    class="canvas"
-  ></canvas>
+  <div class="flex flex-col justify-center">
+    <div class="">
+      <canvas
+        ref="canvasRef"
+        :width="canvasWidth"
+        :height="canvasHeight"
+        tabindex="0"
+        class="canvas"
+        :style="{ transform: `scale(${scale + 1})` }"
+      ></canvas>
+    </div>
+  </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+canvas {
+  transform-origin: left top;
+}
+</style>

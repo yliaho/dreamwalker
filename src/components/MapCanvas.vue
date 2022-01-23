@@ -44,9 +44,12 @@ function draw(
   canvasWidth: number,
   canvasHeight: number
 ) {
+  ctx.imageSmoothingEnabled = false;
   ctx.clearRect(0, 0, canvasWidth, canvasHeight);
   imageDatas.forEach(async (imageData, index) => {
-    ctx.drawImage(await imageData.data, imageData.dx, imageData.dy);
+    const resolvedImageBitmap = await imageData.data;
+    ctx.drawImage(resolvedImageBitmap, imageData.dx, imageData.dy);
+    resolvedImageBitmap.close();
   });
 }
 </script>

@@ -6,6 +6,7 @@ import TilesheetCanvas from "./components/TilesheetCanvas.vue";
 import { useDatasBin, datasBin } from "./useDatasBin";
 import { createTileMapImageData, createTileSheetImageData } from "./draw";
 import MapCanvas from "./components/MapCanvas.vue";
+import TilesheetPalette from "./components/TilesheetPalette.vue";
 
 useDatasBin(datasBin);
 
@@ -16,6 +17,7 @@ const paletteIndexRef = ref<number>(0);
 const mapCount = ref<Array<number>>();
 const tilesheetImageDataRef = ref<ImageData>();
 const tileMapImageDataRef = ref<ImageData>();
+const tileSheetCanvasScaleRef = ref<number>(0);
 const tileMapImageDatasRef =
   ref<Array<{ dx: number; dy: number; data: Promise<ImageBitmap> }>>();
 const palettesRef = computed(() => {
@@ -113,7 +115,7 @@ function drawTileMap(gameMap: GameMap) {
 <template>
   <div :class="`flex flex-col h-screen`">
     <header
-      class="col-span-2 flex flex-row justify-between border-b border-gray-800 px-4 pb-4 pt-1 fixed top-0 left-0 right-0 bg-black bg-opacity-50 z-10 backdrop-brightness-75 backdrop-blur"
+      class="col-span-2 flex flex-row justify-between px-4 py-4 fixed top-0 left-0 right-0 bg-black bg-opacity-50 z-10 backdrop-brightness-75 backdrop-blur"
     >
       <section>
         <label for="file" class="form-label"></label>
@@ -127,13 +129,10 @@ function drawTileMap(gameMap: GameMap) {
           />
         </div>
       </section>
-      <section>
-        <button>Index Colors</button>
-      </section>
     </header>
-    <main class="flex space-x-2 h-full">
+    <main class="flex h-full">
       <aside
-        class="border-r border-gray-800 w-96 pt-4 max-w-md h-full fixed inset-0 z-10 bg-black top-[46px] flex flex-col space-y-4"
+        class="w-[379px] pt-4 fixed inset-0 z-10 bg-black top-[46px] flex flex-col space-y-0"
         v-if="tilesheetImageDataRef"
       >
         <section class="px-4">
@@ -151,46 +150,40 @@ function drawTileMap(gameMap: GameMap) {
             </select>
           </div>
         </section>
-        <section class="h-94">
-          <ul
-            class="overflow-y-auto border border-gray-800 bg-gray-900 mx-4 palette h-64"
-          >
-            <ul
-              v-for="(pal, i) in palettesRef"
-              :class="`flex ${
-                paletteIndexRef === i ? 'border-red-500' : 'border-black'
-              }`"
-            >
-              <li
-                :class="`flex flex-1 h-6 items-center justify-center bg-gray-800 border-r border-x-gray-700`"
-              >
-                <div
-                  :class="`w-4 h-4 rounded-full ${
-                    paletteIndexRef === i ? 'bg-blue-500' : ''
-                  }`"
-                ></div>
-              </li>
-              <li
-                v-for="c in pal"
-                :class="`flex-1 h-6`"
-                @click="onPaletteIndexClick(i)"
-              >
-                <div
-                  class="w-full h-full"
-                  :style="{
-                    backgroundColor: `rgba(${c.r}, ${c.g}, ${c.b}, ${c.a})`,
-                  }"
-                ></div>
-              </li>
-            </ul>
-          </ul>
+        <section class="h-96 overflow-y-auto">
+          <TilesheetPalette
+            :palette-index="paletteIndexRef"
+            :palettes="palettesRef"
+            @change-palette="(index) => onPaletteIndexClick(index)"
+          />
         </section>
-        <section class="overflow-auto mx-4 h-full">
-          <TilesheetCanvas :image-data="tilesheetImageDataRef" />
+        <section class="overflow-auto h-full">
+          <section
+            class="sticky top-2 left-2 right-2 flex flex-row-reverse z-10 py-1 px-1 bg-black bg-opacity-50 mx-2 rounded"
+          >
+            <button
+              :class="`m-1 rounded w-32 py-1 shadow shadow-black ${
+                tileSheetCanvasScaleRef === 0 ? `bg-gray-500` : `bg-blue-600`
+              }`"
+              @click="
+                () =>
+                  (tileSheetCanvasScaleRef = (tileSheetCanvasScaleRef + 1) & 1)
+              "
+            >
+              {{ tileSheetCanvasScaleRef === 0 ? "1x" : "2x" }}
+            </button>
+          </section>
+          <div class="">
+            <TilesheetCanvas
+              :image-data="tilesheetImageDataRef"
+              :palette-index="paletteIndexRef"
+              :scale="tileSheetCanvasScaleRef"
+            />
+          </div>
         </section>
       </aside>
       <main
-        class="pl-96 w-full bg-black flex flex-row space-x-2 overflow-hidden pt-[52px]"
+        class="pl-[379px] w-full bg-black flex flex-row space-x-2 overflow-hidden pt-[54px]"
         v-if="tilesheetImageDataRef"
       >
         <section class="overflow-auto flex-1">
@@ -208,14 +201,14 @@ function drawTileMap(gameMap: GameMap) {
 <style>
 * {
   image-rendering: -webkit-optimize-contrast; /* webkit */
+  image-rendering: -moz-crisp-edges; /* Firefox */
 }
 body {
   @apply bg-black text-white tracking-tighter;
 }
 
 canvas {
-  transform-origin: left top;
-  transform: scale(1);
+  image-rendering: pixelate;
 }
 
 input[type="file"]::-webkit-file-upload-button,
