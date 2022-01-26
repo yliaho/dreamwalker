@@ -247,7 +247,10 @@ export class GameMap {
   }
 
   public generateTileBitmap(tile: number, palette: Argb32[]) {
-    console.assert(tile < 10 * 16 * 6, `bad tile index (${tile})`);
+    console.assert(
+      tile < 10 * 16 * 6,
+      `bad tile index (${tile}). This tile's transparency will be set to 0.`
+    );
     const tileBuffer = new Uint8Array((24 * 16 * 4) / 8);
     const tileX = (tile % 10) * 24;
     const tileY = ~~(tile / 10) * 16;
@@ -255,15 +258,23 @@ export class GameMap {
       for (let y = 0; y < 16; y++) {
         blockCopy(
           this.tilesheetImageData!,
-          ~~((tileY + y) * 256) / 2 + tileX / 2,
+          ~~(((tileY + y) * 256) / 2 + tileX / 2),
           tileBuffer,
-          ~~(y * 24) / 2,
+          ~~((y * 24) / 2),
           ~~(24 / 2)
         );
       }
     }
 
-    return bitmapDataFromPsxBuff(tileBuffer, 24, 16, 4, palette);
+    return bitmapDataFromPsxBuff(
+      tileBuffer,
+      24,
+      16,
+      4,
+      tile < 10 * 16 * 6
+        ? palette
+        : palette.map((color) => ({ ...color, a: 0 }))
+    );
   }
 
   generateTilesheetBitmap(palette: Argb32[]) {
