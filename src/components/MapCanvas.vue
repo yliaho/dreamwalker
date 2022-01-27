@@ -1,65 +1,29 @@
 <script setup lang="ts">
-import { ref, watchEffect } from "vue";
+import { Renderer, Tile, TileMap } from "../lib/renderer";
+import { ref, onMounted, watchEffect } from "vue";
 
-type ScrollMap = {
-  v: number;
-  h: number;
-};
+const props = defineProps<{
+  tiles: Tile[];
+}>();
 
-const props = defineProps({
-  imageDatas: Array,
-  canvasWidth: Number,
-  canvasHeight: Number,
-});
-
-const canvasRef = ref<HTMLCanvasElement>();
-const scrollMapRef = ref<ScrollMap>({
-  v: 0,
-  h: 0,
-});
-const scaleRef = ref<number>(1);
-
+const tilemapTargetRef = ref<HTMLElement>();
+let renderer: Renderer;
 watchEffect(() => {
-  if (
-    !props.imageDatas ||
-    !canvasRef.value ||
-    !props.canvasWidth ||
-    !props.canvasHeight
-  ) {
-    console.error("no map or other stuff");
+  if (!tilemapTargetRef.value) {
     return;
   }
-
-  draw(
-    canvasRef.value.getContext("2d")!,
-    props.imageDatas as any,
-    props.canvasWidth,
-    props.canvasHeight
-  );
-});
-
-function draw(
-  ctx: CanvasRenderingContext2D,
-  imageDatas: Array<{ dx: number; dy: number; data: Promise<ImageBitmap> }>,
-  canvasWidth: number,
-  canvasHeight: number
-) {
-  ctx.imageSmoothingEnabled = false;
-  ctx.clearRect(0, 0, canvasWidth, canvasHeight);
-  imageDatas.forEach(async (imageData, index) => {
-    const resolvedImageBitmap = await imageData.data;
-    ctx.drawImage(resolvedImageBitmap, imageData.dx, imageData.dy);
-    resolvedImageBitmap.close();
+  renderer = new Renderer({
+    targetSelector: "#target",
+    width: 52 * 24,
+    height: 60 * 16,
   });
-}
+
+  Renderer.textureCache.clear();
+
+  renderer.instance.stage.addChild(new TileMap(props.tiles).container);
+});
 </script>
 
 <template>
-  <canvas
-    ref="canvasRef"
-    :width="canvasWidth"
-    :height="canvasHeight"
-    tabindex="0"
-    class="canvas"
-  ></canvas>
+  <div ref="tilemapTargetRef" id="target"></div>
 </template>

@@ -7,19 +7,19 @@ import { useDatasBin, datasBin } from "./useDatasBin";
 import { createTileMapImageData, createTileSheetImageData } from "./draw";
 import MapCanvas from "./components/MapCanvas.vue";
 import TilesheetPalette from "./components/TilesheetPalette.vue";
+import { Tile } from "./lib/renderer";
 
 useDatasBin(datasBin);
 
 const fileInputRef = ref<HTMLInputElement>();
 
-const mapIndexRef = ref<number>(11);
+const mapIndexRef = ref<number>(234);
 const paletteIndexRef = ref<number>(0);
 const mapCount = ref<Array<number>>();
 const tilesheetImageDataRef = ref<ImageData>();
 const tileMapImageDataRef = ref<ImageData>();
 const tileSheetCanvasScaleRef = ref<number>(0);
-const tileMapImageDatasRef =
-  ref<Array<{ dx: number; dy: number; data: Promise<ImageBitmap> }>>();
+const tileMapImageDatasRef = ref<Tile[]>();
 const palettesRef = computed(() => {
   if (!datasBin) {
     return [];
@@ -187,11 +187,7 @@ function drawTileMap(gameMap: GameMap) {
         v-if="tilesheetImageDataRef"
       >
         <section class="overflow-auto flex-1">
-          <MapCanvas
-            :image-datas="tileMapImageDatasRef"
-            :canvas-width="datasBin.gameMaps![mapIndexRef].map?.width! * 24"
-            :canvas-height="datasBin.gameMaps![mapIndexRef].map?.height! * 16"
-          />
+          <MapCanvas :tiles="tileMapImageDatasRef!" />
         </section>
       </main>
     </main>

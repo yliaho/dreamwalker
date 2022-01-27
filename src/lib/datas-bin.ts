@@ -58,7 +58,7 @@ export function fromPsxColor(c: number) {
   const b = (c & 0x1f) << 3;
   const a = c != 0 ? 255 : 0;
 
-  return new Argb32(b, g, r, a);
+  return new Argb32(g, r, a, b);
 }
 
 function deflate(data: Uint8Array, dest: Uint8Array) {
@@ -186,7 +186,8 @@ export class GameMap {
   private memoryAddress: number = 0x153460; // + 0x260;
   public tilesheetImageData: Uint8Array | null = null;
   public tilesheetBitmap: any;
-  public map: AMap | null = null;
+  public map: TileMap | null = null;
+  public loaded: boolean = false;
   private tileCache: Map<number, Uint8Array> = new Map();
 
   constructor(binaryReader: NaiveBinaryReader, dbHeader: DBHeader);
@@ -224,7 +225,7 @@ export class GameMap {
     //map
     if (this.header.mapBlock != -1) {
       binaryReader.jumpPosition(this.binOffset + this.header.mapBlock);
-      this.map = new AMap(
+      this.map = new TileMap(
         binaryReader,
         this.memoryAddress + this.header.mapBlock
       );
@@ -244,6 +245,8 @@ export class GameMap {
       this.tilesheetImageData = createUInt8ArrayFrom((256 * 256 * 6) / 2);
       deflate(buffer, this.tilesheetImageData);
     }
+
+    this.loaded = true;
   }
 
   public generateTileBitmap(tile: number, palette: Argb32[]) {
@@ -306,7 +309,7 @@ export class GameMap {
   }
 }
 
-class AMap {
+class TileMap {
   private memoryAddress: number;
   public readonly width: number;
   public readonly height: number;

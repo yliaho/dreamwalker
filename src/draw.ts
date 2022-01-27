@@ -1,4 +1,5 @@
 import { Argb32, GameMap } from "./lib/datas-bin";
+import { Tile, Renderer } from "./lib/renderer";
 
 export function createTileSheetImageData(
   buffer: Uint8Array,
@@ -60,7 +61,7 @@ export function createTileMapImageData(
   scrollMap: { v: number; h: number },
   mapWidth: number,
   scale: number
-): Array<{ dx: number; dy: number; data: Promise<ImageBitmap> }> {
+): Tile[] {
   tileCache.clear();
   const map = gameMap.map;
 
@@ -69,8 +70,7 @@ export function createTileMapImageData(
     return [];
   }
 
-  const tiles: Array<{ dx: number; dy: number; data: Promise<ImageBitmap> }> =
-    [];
+  const tiles: Array<Tile> = [];
 
   for (let y = 0; y < map.height; y++) {
     for (let x = 0; x < map.width / scale; x++) {
@@ -80,30 +80,57 @@ export function createTileMapImageData(
       const dy = (y - tile.height) * scale * 16;
 
       if (tile.tileId !== -1) {
-        const tileImageData = new ImageData(24 * scale, 16 * scale);
-        drawTo(tileImageData, getTile(tile.tileId, gameMap), 0, 0);
-        tiles.push({ dx, dy, data: createImageBitmap(tileImageData) });
+        // const tileImageData = new ImageData(24 * scale, 16 * scale);
+        // drawTo(tileImageData, getTile(tile.tileId, gameMap), 0, 0);
+        // tiles.push({ dx, dy, data: createImageBitmap(tileImageData) });
+        Renderer.createTexture(`${tile.tileId & 0x3ff}`, {
+          buffer: getTile(tile.tileId, gameMap),
+          width: 24,
+          height: 16,
+        });
+        tiles.push(
+          new Tile({
+            textureId: `${tile.tileId & 0x3ff}`,
+            x: dx,
+            y: dy,
+            z: 1,
+          })
+        );
       }
 
-      if (tile.wallTiles) {
-        for (let index = 0; index < tile.wallTiles.count; index++) {
-          if (tile.wallTiles.tiles[index] !== -1) {
-            const wallTileImageData = new ImageData(24 * scale, 16 * scale);
-            drawTo(
-              wallTileImageData,
-              getTile(tile.wallTiles.tiles[index], gameMap),
-              0,
-              0,
-              true
-            );
-            tiles.push({
-              dx,
-              dy: dy + (index - tile.wallTiles.offset + 1) * 16 * scale,
-              data: createImageBitmap(wallTileImageData),
-            });
-          }
-        }
-      }
+      // if (tile.wallTiles) {
+      //   for (let index = 0; index < tile.wallTiles.count; index++) {
+      //     if (tile.wallTiles.tiles[index] !== -1) {
+      //       // const wallTileImageData = new ImageData(24 * scale, 16 * scale);
+      //       // drawTo(
+      //       //   wallTileImageData,
+      //       //   getTile(tile.wallTiles.tiles[index], gameMap),
+      //       //   0,
+      //       //   0,
+      //       //   true
+      //       // );
+      //       // tiles.push({
+      //       //   dx,
+      //       //   dy: dy + (index - tile.wallTiles.offset + 1) * 16 * scale,
+      //       //   data: createImageBitmap(wallTileImageData),
+      //       // });
+
+      //       Renderer.createTexture(`${tile.tileId & 0x3ff}_wall`, {
+      //         buffer: getTile(tile.wallTiles.tiles[index], gameMap),
+      //         width: 24,
+      //         height: 16,
+      //       });
+      //       tiles.push(
+      //         new Tile({
+      //           textureId: `${tile.tileId & 0x3ff}`,
+      //           x: dx,
+      //           y: dy + (index - tile.wallTiles.offset + 1) * 16,
+      //           z: 1,
+      //         })
+      //       );
+      //     }
+      //   }
+      // }
     }
   }
 
