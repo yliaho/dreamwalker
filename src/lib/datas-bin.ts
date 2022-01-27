@@ -186,6 +186,9 @@ export class GameMap {
   private memoryAddress: number = 0x153460; // + 0x260;
   public tilesheetImageData: Uint8Array | null = null;
   public tilesheetBitmap: any;
+  public spritesheetImageData: Uint8Array | null = null;
+  public numSpritesheets = 8;
+  public spriteInfo: SpriteInfo | null = null;
   public map: AMap | null = null;
   private tileCache: Map<number, Uint8Array> = new Map();
 
@@ -243,6 +246,29 @@ export class GameMap {
       binaryReader.read(buffer, 0, buffer.length);
       this.tilesheetImageData = createUInt8ArrayFrom((256 * 256 * 6) / 2);
       deflate(buffer, this.tilesheetImageData);
+    }
+
+    // spriteinfo
+    if (this.header.spriteInfo !== -1) {
+      binaryReader.jumpPosition(this.binOffset + this.header.spriteInfo);
+      this.spriteInfo = new SpriteInfo(
+        binaryReader,
+        this.memoryAddress + this.header.spriteInfo,
+        this.header.spritesheets,
+        isMap
+      );
+    }
+
+    // spritesheet
+    if (this.header.spritesheets !== -1) {
+      binaryReader.jumpPosition(this.binOffset + this.header.spritesheets + 6);
+      const buffer = createUInt8ArrayFrom(this.header.spriteSize - 6);
+      binaryReader.read(buffer, 0, buffer.length);
+      //numspritesheets 256x256 4bpp bitmaps
+      this.spritesheetImageData = createUInt8ArrayFrom(
+        (256 * 356 * this.numSpritesheets) / 2
+      );
+      deflate(buffer, this.spritesheetImageData);
     }
   }
 
@@ -304,6 +330,16 @@ export class GameMap {
 
     return this.tilesheetBitmap;
   }
+}
+
+class SpriteInfo {
+  public binOffset: number;
+  constructor(
+    binaryReader: NaiveBinaryReader,
+    memoryAddress: number,
+    sectorEnd: number,
+    isMap: boolean
+  ) {}
 }
 
 class AMap {
