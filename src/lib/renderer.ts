@@ -168,5 +168,7 @@ export class TileMap extends Renderable {
     tiles.forEach((tile) => {
       this.container.addChild(tile.container);
     });
+
+    this.container.cacheAsBitmap = true;
   }
 }
