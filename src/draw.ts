@@ -72,6 +72,8 @@ export function createTileMapImageData(
 
   const tiles: Array<Tile> = [];
 
+  console.time("tiles drawn");
+
   for (let y = 0; y < map.height; y++) {
     for (let x = 0; x < map.width / scale; x++) {
       const tile = map.mapTiles[y * map.width + x];
@@ -98,41 +100,29 @@ export function createTileMapImageData(
         );
       }
 
-      // if (tile.wallTiles) {
-      //   for (let index = 0; index < tile.wallTiles.count; index++) {
-      //     if (tile.wallTiles.tiles[index] !== -1) {
-      //       // const wallTileImageData = new ImageData(24 * scale, 16 * scale);
-      //       // drawTo(
-      //       //   wallTileImageData,
-      //       //   getTile(tile.wallTiles.tiles[index], gameMap),
-      //       //   0,
-      //       //   0,
-      //       //   true
-      //       // );
-      //       // tiles.push({
-      //       //   dx,
-      //       //   dy: dy + (index - tile.wallTiles.offset + 1) * 16 * scale,
-      //       //   data: createImageBitmap(wallTileImageData),
-      //       // });
-
-      //       Renderer.createTexture(`${tile.tileId & 0x3ff}_wall`, {
-      //         buffer: getTile(tile.wallTiles.tiles[index], gameMap),
-      //         width: 24,
-      //         height: 16,
-      //       });
-      //       tiles.push(
-      //         new Tile({
-      //           textureId: `${tile.tileId & 0x3ff}`,
-      //           x: dx,
-      //           y: dy + (index - tile.wallTiles.offset + 1) * 16,
-      //           z: 1,
-      //         })
-      //       );
-      //     }
-      //   }
-      // }
+      if (tile.wallTiles) {
+        for (let index = 0; index < tile.wallTiles.count; index++) {
+          if (tile.wallTiles.tiles[index] !== -1) {
+            Renderer.createTexture(`${tile.wallTiles.tiles[index] & 0x3ff}`, {
+              buffer: getTile(tile.wallTiles.tiles[index], gameMap),
+              width: 24,
+              height: 16,
+            });
+            tiles.push(
+              new Tile({
+                textureId: `${tile.wallTiles.tiles[index] & 0x3ff}`,
+                x: dx,
+                y: dy + (index - tile.wallTiles.offset + 1) * 16,
+                z: 1,
+              })
+            );
+          }
+        }
+      }
     }
   }
+
+  console.timeEnd("tiles drawn");
 
   return tiles;
 }

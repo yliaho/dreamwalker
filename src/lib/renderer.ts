@@ -62,7 +62,8 @@ export class Renderer {
       height: number;
     }
   ) {
-    if (!this.textureCache.get(id)) {
+    const cacheHit = this.textureCache.get(id);
+    if (!cacheHit) {
       this.textureCache.set(
         id,
         this.engine.Texture.fromBuffer(
@@ -73,7 +74,8 @@ export class Renderer {
       );
     }
 
-    return this.textureCache.get(id);
+    const texture = this.textureCache.get(id)!;
+    return texture;
   }
 
   static createContainer(
@@ -150,6 +152,7 @@ export class Tile extends Renderable {
     y: number;
     z?: number;
   }) {
+    const timeId = `${Date.now()}`;
     super();
     this.container.addChild(Renderer.createSprite(options.textureId));
 
