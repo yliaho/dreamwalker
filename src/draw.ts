@@ -72,8 +72,6 @@ export function createTileMapImageData(
 
   const tiles: Array<Tile> = [];
 
-  console.time("tiles drawn");
-
   for (let y = 0; y < map.height; y++) {
     for (let x = 0; x < map.width / scale; x++) {
       const tile = map.mapTiles[y * map.width + x];
@@ -95,7 +93,7 @@ export function createTileMapImageData(
             textureId: `${tile.tileId & 0x3ff}`,
             x: dx,
             y: dy,
-            z: 1,
+            z: (y - tile.height) * scale * 16,
           })
         );
       }
@@ -113,7 +111,7 @@ export function createTileMapImageData(
                 textureId: `${tile.wallTiles.tiles[index] & 0x3ff}`,
                 x: dx,
                 y: dy + (index - tile.wallTiles.offset + 1) * 16,
-                z: 1,
+                z: dy + (index - tile.wallTiles.offset + 1) * 16,
               })
             );
           }
@@ -121,8 +119,6 @@ export function createTileMapImageData(
       }
     }
   }
-
-  console.timeEnd("tiles drawn");
 
   return tiles;
 }

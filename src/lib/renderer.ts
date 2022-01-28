@@ -164,6 +164,7 @@ export class Tile extends Renderable {
 export class TileMap extends Renderable {
   constructor(tiles: Tile[]) {
     super();
+    this.container.sortableChildren = true;
     tiles.forEach((tile) => {
       this.container.addChild(tile.container);
     });
