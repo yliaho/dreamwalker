@@ -117,8 +117,6 @@ class Renderable {
     options: { x?: number; y?: number; z?: number; visible?: boolean } = {}
   ) {
     this.container = Renderer.createContainer(options);
-
-    Renderer.register(this);
   }
 
   destructor() {
@@ -152,7 +150,6 @@ export class Tile extends Renderable {
     y: number;
     z?: number;
   }) {
-    const timeId = `${Date.now()}`;
     super();
     this.container.addChild(Renderer.createSprite(options.textureId));
 
